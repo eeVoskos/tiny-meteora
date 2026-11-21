@@ -2,6 +2,8 @@
 
 An interactive pixel-art atlas of Kalampaka, Kastraki, and the Meteora monasteries. Explore in English or Greek, toggle animated life and trails, and switch between sunrise, day, sunset, and night.
 
+![Tiny Meteora web app showing the map layers, landmark list, and all six monasteries](docs/screenshot.webp)
+
 ## Run the map
 
 ```sh
