@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f0e5">
+  <meta name="description" data-i18n-content="description" content="Explore Kalampaka, Kastraki and the rock-top monasteries of Meteora in an interactive isometric pixel-art atlas.">
+  <meta property="og:title" content="Tiny Meteora">
+  <meta property="og:description" content="An isometric pixel-art map of Kalampaka, Kastraki and Meteora, Greece.">
+  <title data-i18n="pageTitle">Tiny Meteora · Kalampaka, Greece</title>
+  <link rel="icon" href="./assets/favicon.png">
+  <link rel="preload" as="image" href="./assets/meteora.webp">
+  <link rel="stylesheet" href="./atlas.css">
+  <script type="module" src="./atlas.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="#" id="brand" data-i18n-label="homeLabel" aria-label="Tiny Meteora home">
+      <img src="./assets/favicon.png" width="44" height="44" alt="">
+      <div><strong lang="en">Tiny Meteora</strong><span data-i18n="brandLocation">Kalampaka, Greece</span></div>
+    </a>
+    <div class="masthead-actions">
+      <div class="language-switch" role="group" data-i18n-label="language" aria-label="Map language">
+        <button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
+        <button type="button" data-language="el" lang="el" aria-label="Ελληνικά" aria-pressed="false">ΕΛ</button>
+      </div>
+      <button class="button ghost" id="about-button" type="button" data-icon="info"><span class="action-label" data-i18n="about">About</span></button>
+      <button class="button primary" id="share-button" type="button" data-icon="share"><span class="action-label" data-i18n="shareView">Share view</span></button>
+    </div>
+  </header>
+  <main class="atlas">
+    <aside class="sidebar" id="sidebar" data-i18n-label="exploreMeteora" aria-label="Explore Meteora">
+      <div class="sidebar-top">
+        <div class="intro">
+          <p class="kicker" data-i18n="region">Kalampaka · Meteora</p>
+          <h1 data-i18n="exploreMeteora">Explore Meteora</h1>
+          <p data-i18n="intro">Follow the streets of Kalampaka and Kastraki up to the monasteries in the rock towers.</p>
+        </div>
+        <label class="search" for="search">
+          <span class="sr-only" data-i18n="findPlace">Find a place</span>
+          <i data-icon="search" aria-hidden="true"></i>
+          <input type="search" id="search" data-i18n-placeholder="searchPlaceholder" placeholder="Find a place…" autocomplete="off">
+          <kbd aria-hidden="true">/</kbd>
+        </label>
+        <fieldset class="layer-group">
+          <legend data-i18n="mapLayers">Map layers</legend>
+          <div class="layer-buttons">
+            <button class="layer town" data-layer="town" data-icon="pin" aria-pressed="true"><span data-i18n="places">Places</span></button>
+            <button class="layer monastery" data-layer="monastery" data-icon="temple" aria-pressed="true"><span data-i18n="monasteries">Monasteries</span></button>
+            <button class="layer trails" data-layer="trails" data-icon="trail" aria-pressed="false"><span data-i18n="trails">Trails</span></button>
+            <button class="layer viewpoint" data-layer="viewpoint" data-icon="eye" aria-pressed="false"><span data-i18n="scenicSpots">Scenic spots</span></button>
+            <button class="layer civic" data-layer="civic" data-icon="square" aria-pressed="false"><span data-i18n="townDetails">Town details</span></button>
+            <button class="layer life" data-layer="life" data-icon="bird" aria-pressed="false" data-i18n-title="lifeHelp" title="Clouds, birds, water, walkers and road traffic"><span data-i18n="animatedLife">Animated life</span></button>
+          </div>
+        </fieldset>
+        <fieldset class="time-group">
+          <legend data-i18n="timeOfDay">Time of day</legend>
+          <div class="time-presets">
+            <label class="time-choice"><input class="sr-only" type="radio" name="lighting" value="sunrise"><span class="time-face" data-icon="sunrise"><span data-i18n="sunrise">Sunrise</span></span></label>
+            <label class="time-choice"><input class="sr-only" type="radio" name="lighting" value="day" checked><span class="time-face" data-icon="sun"><span data-i18n="day">Day</span></span></label>
+            <label class="time-choice"><input class="sr-only" type="radio" name="lighting" value="sunset"><span class="time-face" data-icon="sunset"><span data-i18n="sunset">Sunset</span></span></label>
+            <label class="time-choice"><input class="sr-only" type="radio" name="lighting" value="night"><span class="time-face" data-icon="moon"><span data-i18n="night">Night</span></span></label>
+          </div>
+        </fieldset>
+      </div>
+      <section class="listing" id="listing" data-i18n-label="placesAndLandmarks" aria-label="Places and landmarks">
+        <div class="list-heading"><h2 id="list-title">Landmarks</h2><span id="list-count"></span></div>
+        <ul id="place-list"></ul>
+      </section>
+    </aside>
+    <section class="viewport" id="viewport" data-i18n-label="interactiveMap" aria-label="Interactive map" aria-describedby="map-help" tabindex="0">
+      <p class="sr-only" id="map-help" data-i18n="mapHelp">Drag to pan and scroll or pinch to zoom. Arrow keys pan. Plus and minus zoom. Press zero for the overview.</p>
+      <svg class="scene-filters" width="0" height="0" aria-hidden="true">
+        <defs>
+          <filter id="sunrise-grade" color-interpolation-filters="sRGB">
+            <feComponentTransfer>
+              <feFuncR type="table" tableValues=".045 .21 .51 .82 1"/>
+              <feFuncG type="table" tableValues=".075 .24 .51 .78 .96"/>
+              <feFuncB type="table" tableValues=".14 .31 .53 .74 .88"/>
+            </feComponentTransfer>
+          </filter>
+          <filter id="sunset-grade" color-interpolation-filters="sRGB">
+            <feComponentTransfer>
+              <feFuncR type="table" tableValues=".095 .255 .52 .81 1"/>
+              <feFuncG type="table" tableValues=".032 .16 .39 .65 .89"/>
+              <feFuncB type="table" tableValues=".115 .239 .403 .57 .745"/>
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
+      <div class="world" id="world" aria-hidden="true">
+        <img src="./assets/meteora.webp" class="terrain" alt="" draggable="false" width="1280" height="896" fetchpriority="high">
+        <div class="terrain-tiles" id="terrain-tiles"></div>
+        <div class="scene-tint"></div>
+        <img data-src="./assets/window-lights.png" class="window-lights" id="window-lights" alt="" draggable="false" width="5120" height="3584" hidden>
+        <img data-src="./assets/trails.png" class="trail-overlay" id="trail-overlay" alt="" draggable="false" width="5120" height="3584" hidden>
+      </div>
+      <canvas class="scene-life" id="scene-life" aria-hidden="true" hidden></canvas>
+      <div class="markers" id="markers" data-i18n-label="markers" aria-label="Map markers"></div>
+      <button class="button browse map-control" id="browse" aria-expanded="false" aria-controls="sidebar" data-icon="search"><span data-i18n="explore">Explore</span></button>
+      <div class="compass map-control" data-i18n-label="north" data-i18n-title="north" aria-label="North" title="North">
+        <span data-i18n="northLetter">N</span><div class="compass-needle"><i></i></div>
+      </div>
+      <div class="map-lower-left map-control">
+        <button class="minimap" id="minimap" type="button" data-i18n-label="overviewLabel" data-i18n-title="overviewHelp" aria-label="Overview map. Click a position to move the view." title="Jump to a spot on the overview">
+          <img src="./assets/overview.webp" alt="" draggable="false">
+          <span id="minimap-box"></span>
+        </button>
+        <div class="scale-bar" id="scale" aria-hidden="true"><span></span></div>
+      </div>
+      <div class="map-buttons map-control" data-i18n-label="mapControls" aria-label="Map controls">
+        <button type="button" id="zoom-in" data-icon="plus" data-i18n-label="zoomIn" data-i18n-title="zoomInHelp" aria-label="Zoom in" title="Zoom in (+)"></button>
+        <button type="button" id="zoom-out" data-icon="minus" data-i18n-label="zoomOut" data-i18n-title="zoomOutHelp" aria-label="Zoom out" title="Zoom out (−)"></button>
+        <button type="button" id="home" data-icon="home" data-i18n-label="resetView" data-i18n-title="resetHelp" aria-label="Reset map view" title="Reset view (0)"></button>
+      </div>
+      <article class="place-card map-control" id="place-card" data-i18n-label="selectedPlace" aria-label="Selected place" aria-live="polite" hidden>
+        <button class="icon-button card-close" id="close-place" data-icon="close" data-i18n-label="closePlace" aria-label="Close place details"></button>
+        <p class="kicker" id="card-type"></p>
+        <h2 id="card-title"></h2>
+        <p class="card-summary" id="card-summary"></p>
+        <div class="card-links">
+          <a id="card-link" target="_blank" rel="noopener">OpenStreetMap</a>
+          <a id="card-satellite" data-i18n="googleSatellite" target="_blank" rel="noopener">Google Satellite</a>
+        </div>
+      </article>
+      <p class="map-error map-control" id="map-error" hidden><span data-i18n="mapError">The map couldn’t load.</span> <button type="button" id="retry" data-i18n="reload">Reload</button></p>
+      <div class="toast" id="toast" role="status" data-i18n="linkCopied" hidden>View link copied</div>
+    </section>
+  </main>
+  <footer class="statusbar">
+    <div><i data-icon="pin" aria-hidden="true"></i> <span><span data-i18n="coordinates">39.71° N, 21.63° E</span> <span class="status-divider">·</span> <span data-i18n="area">Thessaly, Greece</span></span></div>
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
+    <a href="https://stheo.dev/" target="_blank" rel="noopener">stheo.dev</a>
+  </footer>
+  <dialog id="about">
+    <button class="icon-button dialog-close" id="close-about" data-icon="close" data-i18n-label="closeAbout" aria-label="Close about"></button>
+    <img src="./assets/atlas-cover.webp" width="640" height="480" data-i18n-alt="coverAlt" alt="Pixel-art illustration of a monastery above the roofs of Kalampaka">
+    <div class="about-content">
+      <h2 data-i18n="aboutTitle">About Tiny Meteora</h2>
+      <p data-i18n="aboutIntro">An isometric pixel-art atlas of Kalampaka, Kastraki, and the Meteora monasteries.</p>
+      <details class="about-sources">
+        <summary data-i18n="aboutSources">Sources and credits</summary>
+        <p data-i18n="aboutTerrain">The cliffs follow Fotis Giagkas’s 2016 photogrammetry, and mapped building footprints anchor the roofs. The outer valley uses public elevation data.</p>
+        <p data-i18n="aboutTown">Schoolyards, squares, the Town Hall fountain, and the stadium are drawn from mapped features. Google Satellite was used as a visual reference for the town’s surfaces and landmarks.</p>
+        <p data-i18n="aboutRoofs">House roof colors and shapes were refined using a November 2015 aerial survey. Source: Includes solar data from Google.</p>
+        <p><span data-i18n="inspiredBy">Inspired by</span> <a href="https://tiny.london/">Tiny London</a>, <a href="https://tinyrj.com/">Tiny Rio</a>, <a href="https://isometric.nyc/">Isometric NYC</a>, <a href="https://github.com/Janjs/tiny-utrecht">Tiny Utrecht</a> <span data-i18n="andThe">and the</span> <a href="https://tiny.london/world/" data-i18n="tinyWorldAtlas">Tiny World atlas</a>.</p>
+        <p class="credits"><a href="https://zenodo.org/records/10379319" data-i18n="scanCredit">2016 scan by Fotis Giagkas</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="https://www.openstreetmap.org/copyright" data-i18n="osmCredit">© OpenStreetMap contributors</a> · <a href="https://registry.opendata.aws/terrain-tiles/" data-i18n="terrainCredit">Terrain Tiles on AWS</a> · <a href="https://whc.unesco.org/en/list/455/">UNESCO</a> · <a href="https://www.visitgreece.gr/en/experiences/nature/religious-tourism/meteora-monasteries">Visit Greece</a></p>
+      </details>
+    </div>
+  </dialog>
+  <dialog id="share-dialog">
+    <button class="icon-button dialog-close" id="close-share" data-icon="close" data-i18n-label="closeShare" aria-label="Close share dialog"></button>
+    <div class="about-content">
+      <h2 data-i18n="shareTitle">Share this view</h2>
+      <label for="share-url" data-i18n="mapLink">Map link</label>
+      <input id="share-url" type="url" readonly>
+    </div>
+  </dialog>
+</body>
+</html>

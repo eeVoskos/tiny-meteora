@@ -1,0 +1,19 @@
+.DS_Store
+.venv/
+__pycache__/
+/cache/
+/prototype/
+.idea/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# Local deployments and downloaded renderer inputs
+/.openai/
+/data/kalampaka.osm.gz
+/data/terrain/

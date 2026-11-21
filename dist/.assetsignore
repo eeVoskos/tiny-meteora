@@ -1,0 +1,7 @@
+# Keep deployment inputs and editor metadata out of the static asset bundle.
+.*
+*.tif
+*.tiff
+*.glb
+*.pem
+*.key
