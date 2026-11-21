@@ -106,12 +106,17 @@ function chooseLanguage(next) {
 }
 
 function minZoom() {
-  return Math.min(view.width / config.width, view.height / config.height) * .93;
+  // Cover both axes so the viewport never extends beyond the map.
+  return Math.max(view.width / config.width, view.height / config.height);
+}
+
+function clampZoom(zoom) {
+  const minimum = minZoom();
+  return clamp(zoom, minimum, Math.max(minimum, maxZoom));
 }
 
 function homeView() {
-  const cover = Math.max(view.width / config.width, view.height / config.height);
-  const z = Math.min(cover, maxZoom);
+  const z = minZoom();
   const preferred = config.width * (smallScreen.matches ? .57 : .51);
   if (!z) return { x: preferred, y: config.height / 2, z };
   const peaks = config.places.filter(place => place.type === "monastery").map(place => place.x);
@@ -127,7 +132,7 @@ function constrainAxis(center, extent, viewportSize) {
 }
 
 function positionView(x, y, z = view.z) {
-  view.z = clamp(z, Math.min(maxZoom, minZoom()), maxZoom);
+  view.z = clampZoom(z);
   view.x = constrainAxis(x, config.width, view.width);
   view.y = constrainAxis(y, config.height, view.height);
   if (!frame) frame = requestAnimationFrame(renderView);
@@ -217,7 +222,7 @@ function renderView() {
   scaleBar.textContent = `${measurement.toLocaleString(language)} ${t(scale < 1000 ? "meters" : "kilometers")}`;
   scaleBar.style.width = `${scale * view.z / config.metersPerPixel}px`;
   $("zoom-in").disabled = view.z >= maxZoom;
-  $("zoom-out").disabled = view.z <= minZoom();
+  $("zoom-out").disabled = view.z <= minZoom() + 1e-9;
   sceneLife?.redraw();
 }
 
@@ -288,7 +293,7 @@ function flyTo(target) {
 
 function zoomAt(factor, x = view.width / 2, y = view.height / 2) {
   stopAnimation();
-  const z = clamp(view.z * factor, minZoom(), maxZoom);
+  const z = clampZoom(view.z * factor);
   const ratio = (1 / view.z - 1 / z);
   positionView(view.x + (x - view.width / 2) * ratio, view.y + (y - view.height / 2) * ratio, z);
 }
@@ -509,7 +514,7 @@ function bindMap() {
     const old = gesture();
     pointers.set(event.pointerId, localPoint(event));
     const next = gesture();
-    const z = old.distance > 0 ? clamp(view.z * next.distance / old.distance, minZoom(), maxZoom) : view.z;
+    const z = old.distance > 0 ? clampZoom(view.z * next.distance / old.distance) : view.z;
     const worldX = view.x + (old.x - view.width / 2) / view.z;
     const worldY = view.y + (old.y - view.height / 2) / view.z;
     positionView(worldX - (next.x - view.width / 2) / z,
