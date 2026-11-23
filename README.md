@@ -4,6 +4,8 @@ An interactive pixel-art atlas of Kalampaka, Kastraki, and the Meteora monasteri
 
 ![Tiny Meteora web app showing the map layers, landmark list, and all six monasteries](docs/screenshot.webp)
 
+Live demo: https://tiny-meteora.stheo.dev
+
 ## Run the map
 
 ```sh
